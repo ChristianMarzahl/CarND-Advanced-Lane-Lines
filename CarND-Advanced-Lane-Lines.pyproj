@@ -54,6 +54,12 @@
     <Compile Include="experiments\UndistortAndTransform.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="util\LaneDetector.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="util\Line.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="util\PerspectiveTransformation.py">
       <SubType>Code</SubType>
     </Compile>

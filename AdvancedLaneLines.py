@@ -4,9 +4,12 @@ import glob
 import os
 import pickle
 
-from util import ThresholdRoadImage
-from util import PerspectiveTransformation
-from util import CamCalibration
+from util.ThresholdRoadImage import ThresholdRoadImage
+from util.PerspectiveTransformation import PerspectiveTransformation
+from util.CamCalibration import  CameraCalibration
+from util.LaneDetector import LaneDetector
+
+# https://github.com/jeremy-shannon/CarND-Advanced-Lane-Lines
 
 nx = 9 # the number of inside corners in x
 ny = 6 # the number of inside corners in y
@@ -16,34 +19,34 @@ cam_calibration = None
 calibration_file = "camera_calibration.pickle"
 
 if os.path.exists(calibration_file):
-    cam_calibration = CamCalibration.CameraCalibration(calibration_file)
+    cam_calibration = CameraCalibration(calibration_file)
 else: 
     Camera_Calibration.calculate_and_save_calibrations_matrix(calibration_images,nx,ny,calibration_file)
-    cam_calibration = CamCalibration.CameraCalibration(calibration_file)
+    cam_calibration = CameraCalibration(calibration_file)
 
-img = cv2.imread('camera_cal/calibration10.jpg')
-undistorted_image = cam_calibration.undistort_image(img)
-
-# load image
-test_image = cv2.imread("test_images/straight_lines1.jpg")
-
-# undistort image 
-undist_iamge = cam_calibration.undistort_image(test_image)
-
+    
 # threshold image 
-thresholdRoadImage = ThresholdRoadImage.ThresholdRoadImage()
-threshold_image = thresholdRoadImage.compute_threshold(undist_iamge)
+thresholdRoadImage = ThresholdRoadImage()
 
-cv2.imshow("Hallo",threshold_image)
-cv2.waitKey(0)
+test_images_paths = glob.glob('test_images/test*.jpg')
 
 # perspective transformation
-shape = threshold_image.shape[::-1] # (width,height)
-w = shape[0]
-h = shape[1]
-perspectiveTransformation = PerspectiveTransformation.PerspectiveTransformation(w,h)
-warped_image = perspectiveTransformation.apply(threshold_image)
+perspectiveTransformation = PerspectiveTransformation(1280,720)
+lineDetector = LaneDetector(cam_calibration,perspectiveTransformation,thresholdRoadImage)
 
-cv2.imshow("Hallo",warped_image)
-cv2.waitKey(0)
+#for path in test_images_paths:
 
+#    image  =  cv2.imread(path)
+#    image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
+
+#    result = lineDetector.process_frame(image)
+    
+#    result = cv2.cvtColor(result,cv2.COLOR_RGB2BGR)
+#    cv2.imshow("Hallo",result)
+#    cv2.waitKey(0)
+    
+from moviepy.editor import VideoFileClip
+video_output1 = 'challenge_video_output.mp4'
+video_input1 = VideoFileClip('challenge_video.mp4')
+processed_video = video_input1.fl_image(lineDetector.process_frame)
+processed_video.write_videofile(video_output1, audio=False)
