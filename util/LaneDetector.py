@@ -20,8 +20,8 @@ class LaneDetector(object):
         self.right_line = Line(LineType.RightLine)
 
         # Define conversions in x and y from pixels space to meters
-        self.ym_per_pix = 30/720 # 30/720# 3.048/100 # meters per pixel in y dimension, lane line is 10 ft = 3.048 meters
-        self.xm_per_pix = 3.7/700 # 3.7/660# 3.7/378 # meters per pixel in x dimension, lane width is 12 ft = 3.7 meters
+        self.ym_per_pix = 30/720 # meters per pixel in y dimension
+        self.xm_per_pix = 3.7/700 # meters per pixel in x dimension
 
         self.image_offset = 250
         self.dists = []
@@ -106,20 +106,22 @@ class LaneDetector(object):
         # histogram_
         h = np.zeros((256,1280,3))
         if 'histogram_LineType.RightLine' in debug_dictionary:
-            try:
-                hist = debug_dictionary['histogram_LineType.RightLine']
-                cv2.normalize(hist,hist,0,255,cv2.NORM_MINMAX) 
 
-                hist=np.int32(np.around(hist))
-                hist = np.subtract(255,hist)
-                bins = [i for i in range(0,1280)] # np.arange(256).reshape(256,1)
-                pts = np.column_stack((bins,hist))
+            hist = debug_dictionary['histogram_LineType.RightLine']
+            hist = hist.astype(np.float)
+            hist *= 255.0 / hist.max()
 
-                cv2.polylines(h,[pts],False,(255,0,0), 5)
-                resized = cv2.resize(h, (640,360), interpolation=cv2.INTER_AREA)
-                mulit_image[720:720+360,1280:1280+640] = resized
-            except:
-                print ("Hist Error")
+            #cv2.normalize(hist,hist,0,255,cv2.NORM_MINMAX) 
+
+            hist=np.int32(np.around(hist))
+            hist = np.subtract(255,hist)
+            bins = [i for i in range(0,1280)] # np.arange(256).reshape(256,1)
+            pts = np.column_stack((bins,hist))
+
+            cv2.polylines(h,[pts],False,(255,0,0), 5)
+            resized = cv2.resize(h, (640,360), interpolation=cv2.INTER_AREA)
+            mulit_image[720:720+360,1280:1280+640] = resized
+
 
         mulit_image = cv2.resize(mulit_image, (1920,1080), interpolation=cv2.INTER_AREA)
 

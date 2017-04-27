@@ -68,7 +68,6 @@ class Line():
                 percent_diff = (np.sum(np.abs(1-(self.best_fit/fit))))
             if (percent_diff > 1 and len(self.current_fit) > 0):
                 self.detected = False
-                print (self.detected)
             else:
                 self.detected = True
                 self.current_fit.append(fit)

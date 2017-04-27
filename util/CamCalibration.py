@@ -58,7 +58,8 @@ class CameraCalibration(object):
                 imgpoints.append(corners2)
 
                 # Draw and display the corners
-                #img = cv2.drawChessboardCorners(img, (nx,ny), corners,ret)
+                img = cv2.drawChessboardCorners(img, (nx,ny), corners,ret)
+                cv2.imwrite(fname.replace(".jpg","_result.png"),img)
                 #cv2.imshow('img',img)
                 #cv2.waitKey(50)
             else:
