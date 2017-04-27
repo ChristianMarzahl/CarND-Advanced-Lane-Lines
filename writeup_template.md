@@ -1,5 +1,3 @@
-##Writeup Template
-###You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
 
 ---
 
@@ -18,7 +16,10 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/undistort_output.png "Undistorted"
+[image1]: ./output_images/Undist/calibration1.jpg "Original Image"
+[image2]: ./output_images/Undist/undist.png "Undistorted Image"
+
+
 [image2]: ./test_images/test1.jpg "Road Transformed"
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
 [image4]: ./examples/warped_straight_lines.jpg "Warp Example"
@@ -27,29 +28,81 @@ The goals / steps of this project are the following:
 [video1]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
-###Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
+### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
 ---
-###Writeup / README
+### Writeup / README
 
-####1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
+### Camera Calibration
 
-You're reading it!
-###Camera Calibration
-
-####1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
-
-The code for this step is contained in the first code cell of the IPython notebook located in "./examples/example.ipynb" (or in lines # through # of the file called `some_file.py`).  
+####1. Camera matrix and distortion coefficients
 
 I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image.  Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
 
-I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result: 
+The code for the camera calibration is unter "util\CameraCalibration.py" contained in the class CameraCalibration. The class can load a ready calculated camera matrix and distortion coefficients from a pickle file or calculate and store them in one. The following code shniped shows the calculation.
 
-![alt text][image1]
+```python
+    def __calculate_calibrations_matrix(calibration_image_list, nx = 9, ny = 6):
 
-###Pipeline (single images)
+        # Arrays to store object points and image points from all the images
+        objpoints = [] 
+        imgpoints = []
+        
+        # Prepare object points like (0,0,0), (1,0,0), (2,0,0) ..... ,(7,5,0)
+        objp = np.zeros((ny*nx,3), np.float32)
+        objp[:,:2] = np.mgrid[0:nx,0:ny].T.reshape(-1,2) # x,y coordinates
 
-####1. Provide an example of a distortion-corrected image.
+        img_size = None
+
+        # termination criteria
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+        for fname in calibration_image_list:
+            # read in each image in gray scale
+            img = cv2.imread(fname)
+            gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+
+            if img_size == None:
+                img_size = (gray.shape[1], gray.shape[0])
+    
+            ret, corners = cv2.findChessboardCorners(gray, (nx,ny), None)
+            if ret == True:
+                objpoints.append(objp)
+
+                corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
+                imgpoints.append(corners2)
+
+                # Draw and display the corners
+                img = cv2.drawChessboardCorners(img, (nx,ny), corners,ret)
+                cv2.imwrite(fname.replace(".jpg","_result.png"),img)
+                #cv2.imshow('img',img)
+                #cv2.waitKey(50)
+            else:
+                print("Not found: {0}".format(fname))
+
+        ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints,imgpoints,img_size,None,None)
+
+        return mtx, dist
+```
+
+The following gif visualize the process of extracting the checkboard corners. 
+
+
+The function undistort_image apply the undistortion matrix and distortion coefficient on the passed image.
+
+```python
+    def undistort_image(self,img):
+        return cv2.undistort(img, self.camera_matrix, self.distortion_coefficients)
+```
+
+| Original Image        | Undistorted Image   | 
+| :-------------:|:-------------:| 
+| ![alt text][image1]      | ![alt text][image2] | 
+
+
+
+### Pipeline (single images)
+
+#### 1. Provide an example of a distortion-corrected image.
 To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
 ![alt text][image2]
 ####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
