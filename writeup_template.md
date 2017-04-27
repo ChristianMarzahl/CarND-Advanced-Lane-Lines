@@ -229,7 +229,7 @@ Here's an example of my output for this step.
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
 The class **Line** with the methods **sliding_window_polyfit** and **polyfit_using_prev_fit** are used to identify the lane lines. 
-The method **sliding_window_polyfit** uses the sliding window technique with eight windows to find regions with the most with pixels on the binary image. From the extracted pixel positions a polynominal fit second oder is calculated **fit = np.polyfit(y, x, 2)**. If in the previous image a lane could be found and the polynominal fit this fit is used to speed up the procces by calling the method **polyfit_using_prev_fit** which extract the pixel coordinates in the area of the previus fit. 
+The method **sliding_window_polyfit** uses the sliding window technique with eight windows to find regions with the most with pixels on the binary image. From the extracted pixel positions a polynominal fit second oder is calculated **fit = np.polyfit(y, x, 2)**. If in the previous image a lane could be found, the polynominal fit  is used to speed up the procces by calling the method **polyfit_using_prev_fit** which extract the pixel coordinates in the area of the previus fit. 
 
 
 ``` python
@@ -413,17 +413,18 @@ The following image shows all information combined into one plot.
 
 ---
 
-###Pipeline (video)
+### Pipeline (video)
 
-####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
+#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
 Here's a [link to my video result](./project_video.mp4)
 
 ---
 
-###Discussion
+### Discussion
 
-####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
+#### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+1. The pipeline will faile due to bad light conditions which the threshold step can not handle. I spend a majority of my time experimenting with various methods to make the threshold process more robust but the results are not so good. To improve the threshold quality I tryed local and global histogram equalization methods and normalization techniques. 
+2. One possible inprovment could be the use of a better fitting method like RANSAC.
 
