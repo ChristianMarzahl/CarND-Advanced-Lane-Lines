@@ -19,13 +19,10 @@ The goals / steps of this project are the following:
 [image1]: ./output_images/Undist/calibration1.jpg "Original Image"
 [image2]: ./output_images/Undist/undist.png "Undistorted Image"
 
+[image3]: ./output_images/Pipeline/undist_image.png "Undistorted Image"
+[image4]: ./output_images/Pipeline/warped_image.png "bird eye view"
 
-[image2]: ./test_images/test1.jpg "Road Transformed"
-[image3]: ./examples/binary_combo_example.jpg "Binary Example"
-[image4]: ./examples/warped_straight_lines.jpg "Warp Example"
-[image5]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image6]: ./examples/example_output.jpg "Output"
-[video1]: ./project_video.mp4 "Video"
+
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 ### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
@@ -35,7 +32,7 @@ The goals / steps of this project are the following:
 
 ### Camera Calibration
 
-####1. Camera matrix and distortion coefficients
+#### 1. Camera matrix and distortion coefficients
 
 I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image.  Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
 
@@ -102,43 +99,70 @@ The function undistort_image apply the undistortion matrix and distortion coeffi
 
 ### Pipeline (single images)
 
+In the following steps I demonstrate the complete pipline perfomed on each input image. 
+
 #### 1. Provide an example of a distortion-corrected image.
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
-![alt text][image2]
-####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+
+First for each image the function **undistort_image** from the class **CameraCalibration** is called witch uses the opencv function **cv2.undistort**
 
 ![alt text][image3]
 
-####3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
+#### 2. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a function called `apply(image)`.  The `apply()` function takes as inputs an image (`image`). The source (`transform_src`) and destination (`transform_dst`) points are saved as member variables of the class **PerspectiveTransformation** 
+
+``` python
+
+class PerspectiveTransformation(object):
+    """description of class"""
+
+    def __init__(self, image_width, image_height):
+
+        self.image_width = image_width
+        self.image_height = image_height
+        self.offset = 450
+
+        transform_src = np.float32([(570,460),
+                  (710,460), 
+                  (225,690), 
+                  (1070,680)])
+        
+        transform_dst = np.float32([(self.offset,0),
+                  (image_width-self.offset,0),
+                  (self.offset,image_height),
+                  (image_width-self.offset,image_height)])
+
+        self.M = cv2.getPerspectiveTransform(transform_src, transform_dst)
+        self.M_inv = cv2.getPerspectiveTransform(transform_dst, transform_src)
+
+    def apply(self, undist_bin):
+        return cv2.warpPerspective(undist_bin, self.M, (self.image_width,self.image_height), flags=cv2.INTER_LINEAR)
+
+    def apply_inv(self, undist_bin):
+        return cv2.warpPerspective(undist_bin, self.M_inv, (self.image_width,self.image_height), flags=cv2.INTER_LINEAR)
 
 ```
-src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
-
-```
-This resulted in the following source and destination points:
+I chose to hardcode the source and destination points. This resulted in the following source and destination points:
 
 | Source        | Destination   | 
 |:-------------:|:-------------:| 
-| 585, 460      | 320, 0        | 
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
+| 570,460      | 450, 0        | 
+| 710,460      | 830, 0      |
+| 225,690     | 450, 720      |
+| 1070,680      | 830, 720        |
 
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+I verified that my perspective transform was working as expected by visualizing the following brid eye view iamge.
 
 ![alt text][image4]
+
+
+#### 3. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
+
+
+
+I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+
+![alt text][image3]
 
 ####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
