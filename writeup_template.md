@@ -46,7 +46,7 @@ The goals / steps of this project are the following:
 
 I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image.  Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
 
-The code for the camera calibration is unter "util\CameraCalibration.py" contained in the class CameraCalibration. The class can load a ready calculated camera matrix and distortion coefficients from a pickle file or calculate and store them in one. The following code shniped shows the calculation.
+The code for the camera calibration is under "util\CameraCalibration.py" contained in the class CameraCalibration. The class can load a ready calculated camera matrix and distortion coefficients from a pickle file or calculate and store them in one. The following code sniped shows the calculation.
 
 ```python
     def __calculate_calibrations_matrix(calibration_image_list, nx = 9, ny = 6):
@@ -109,7 +109,7 @@ The function undistort_image apply the undistortion matrix and distortion coeffi
 
 ### Pipeline (single images)
 
-In the following steps I demonstrate the complete pipline perfomed on each input image. 
+In the following steps I demonstrate the complete pipeline performed on each input image. 
 
 #### 1. Provide an example of a distortion-corrected image.
 
@@ -161,7 +161,7 @@ I chose to hardcode the source and destination points. This resulted in the foll
 | 225,690     | 450, 720      |
 | 1070,680      | 830, 720        |
 
-I verified that my perspective transform was working as expected by visualizing the following brid eye view iamge.
+I verified that my perspective transform was working as expected by visualizing the following bird eye view image.
 
 ![alt text][image4]
 
@@ -169,7 +169,7 @@ I verified that my perspective transform was working as expected by visualizing 
 #### 3. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
 
-I used only two types of color thresholds to generate a binary image. The first threshold was performed in the HLS colorspace on the L channel with a range from 220 to 255. The second threshold was performed in the LAB colorspace on the L channel with a range from 190 to 255. Afterwards the two methods were combined to a combined_binary.
+I used only two types of color thresholds to generate a binary image. The first threshold was performed in the HLS color space  on the L channel with a range from 220 to 255. The second threshold was performed in the LAB color space on the L channel with a range from 190 to 255. Afterwards the two methods were combined to a combined_binary.
 
 ``` python
 
@@ -229,7 +229,7 @@ Here's an example of my output for this step.
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
 The class **Line** with the methods **sliding_window_polyfit** and **polyfit_using_prev_fit** are used to identify the lane lines. 
-The method **sliding_window_polyfit** uses the sliding window technique with eight windows to find regions with the most with pixels on the binary image. From the extracted pixel positions a polynominal fit second oder is calculated **fit = np.polyfit(y, x, 2)**. If in the previous image a lane could be found, the polynominal fit  is used to speed up the procces by calling the method **polyfit_using_prev_fit** which extract the pixel coordinates in the area of the previus fit. 
+The method **sliding_window_polyfit** uses the sliding window technique with eight windows to find regions with the most with pixels on the binary image. From the extracted pixel positions a polynomial fit second order is calculated **fit = np.polyfit(y, x, 2)**. If in the previous image a lane could be found, the polynominal fit  is used to speed up the process by calling the method **polyfit_using_prev_fit** which extract the pixel coordinates in the area of the previous fit. 
 
 
 ``` python
@@ -342,7 +342,7 @@ The method **sliding_window_polyfit** uses the sliding window technique with eig
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-The code for calculating the curviness is also in the class **Line** in the method **calculate_curviness**. The value of ym_per_pix is 30/720 which is meters per pixel in y dimension and for xm_per_pix is 3.7/700 which meters per pixel in x dimension. The mathematical detail are describted [hier](http://www.intmath.com/applications-differentiation/8-radius-curvature.php). 
+The code for calculating the curviness is also in the class **Line** in the method **calculate_curviness**. The value of ym_per_pix is 30/720 which is meters per pixel in y dimension and for xm_per_pix is 3.7/700 which meters per pixel in x dimension. The mathematical details are described [here](http://www.intmath.com/applications-differentiation/8-radius-curvature.php). 
 
 ``` python
     def calculate_curviness(self, image, ym_per_pix, xm_per_pix):
@@ -423,7 +423,7 @@ Here's a [link to my video result](./project_video_output.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-1. The pipeline will faile due to bad light conditions which the threshold step can not handle. I spend a majority of my time experimenting with various methods to make the threshold process more robust but the results are not so good. To improve the threshold quality I tryed local and global histogram equalization methods and normalization techniques. 
-2. One possible inprovment could be the use of a better fitting method like RANSAC.
+1. The pipelines will fail due to bad light conditions which the threshold step cannot handle. I spend a majority of my time experimenting with various methods to make the threshold process more robust but the results are not so good. To improve the threshold quality I tried local and global histogram equalization methods and normalization techniques.
+2. One possible improvement could be the use of a better fitting method like RANSAC.
 3. A post processing step which removes single light pixels for the binary image could beneficial 
 4. For the road segmentation could be a deep learning process used. Which would reduce the process of manualy finding the road. Examples of networks for the purpose are [Free-Space Detection with Self-Supervised and Online Trained Fully Convolutional Networks](https://arxiv.org/pdf/1604.02316.pdf) and [SegNet](http://mi.eng.cam.ac.uk/projects/segnet/)
