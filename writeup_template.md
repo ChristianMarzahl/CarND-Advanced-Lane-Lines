@@ -340,8 +340,6 @@ The method **sliding_window_polyfit** uses the sliding window technique with eig
 | ![alt text][image9]      | ![alt text][image10] | ![alt text][image11]  |
 
 
-![alt text][image5]
-
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
 The code for calculating the curviness is also in the class **Line** in the method **calculate_curviness**. The value of ym_per_pix is 30/720 which is meters per pixel in y dimension and for xm_per_pix is 3.7/700 which meters per pixel in x dimension. The mathematical detail are describted [hier](http://www.intmath.com/applications-differentiation/8-radius-curvature.php). 
@@ -417,7 +415,7 @@ The following image shows all information combined into one plot.
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./project_video_output.mp4)
 
 ---
 
@@ -427,4 +425,5 @@ Here's a [link to my video result](./project_video.mp4)
 
 1. The pipeline will faile due to bad light conditions which the threshold step can not handle. I spend a majority of my time experimenting with various methods to make the threshold process more robust but the results are not so good. To improve the threshold quality I tryed local and global histogram equalization methods and normalization techniques. 
 2. One possible inprovment could be the use of a better fitting method like RANSAC.
-
+3. A post processing step which removes single light pixels for the binary image could beneficial 
+4. For the road segmentation could be a deep learning process used. Which would reduce the process of manualy finding the road. Examples of networks for the purpose are [Free-Space Detection with Self-Supervised and Online Trained Fully Convolutional Networks](https://arxiv.org/pdf/1604.02316.pdf) and [SegNet](http://mi.eng.cam.ac.uk/projects/segnet/)
