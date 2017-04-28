@@ -417,6 +417,8 @@ The following image shows all information combined into one plot.
 
 Here's a [link to my video result](./project_video_output.mp4)
 
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=8E08uUodt2k" target="_blank"><img src="http://img.youtube.com/vi/8E08uUodt2k/0.jpg"  alt="project_video_output" width="720" height="360" border="10" /></a>
+
 ---
 
 ### Discussion
