@@ -424,6 +424,6 @@ Here's a [link to my video result](./project_video_output.mp4)
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
 1. The pipelines will fail if light conditions are too bad and cannot be handeled by the the threshold step. I spend the majority of my time experimenting with various methods to make the threshold process more robust but the results were not satisfying. To improve the threshold quality I tried local and global histogram equalization methods and normalization techniques.
-2. One possible improvement could be the use of a better fitting method like RANSAC.
+2. One possible improvement could be the use of a better fitting method like RANSAC. Also, the use of gradient based threshold methods coould be further analysed.
 3. A post processing step which removes single light pixels for the binary image could beneficial 
 4. A deep learning process could be used for the road segmentation.This would reduce the process of manualy finding the road. Examples of networks for the purpose are [Free-Space Detection with Self-Supervised and Online Trained Fully Convolutional Networks](https://arxiv.org/pdf/1604.02316.pdf) and [SegNet](http://mi.eng.cam.ac.uk/projects/segnet/)
